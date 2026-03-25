@@ -205,6 +205,8 @@ public:
 		if (intersect(ray, P, t, N, object_id)) {
 
 			if (objects[object_id]->mirror) {
+        auto reflected_ray = Ray(P+0.0001*N, ray.u -2*dot(ray.u, N)*N);
+        return getColor(reflected_ray, recursion_depth+1);
 
 				// return getColor in the reflected direction, with recursion_depth+1 (recursively)
 			} // else
@@ -219,19 +221,6 @@ public:
       if (maxposdot > 0) {
         return (light_intensity / (4 * M_PI * (light_position - P).norm2())) * (objects[object_id]->albedo / M_PI) * maxposdot;
       }
-
-      /*
-      const double d = (light_position - P).norm();
-      auto w = light_position - P; 
-      w.normalize();
-
-      const double solid_angle = dot(N, w);
-
-      if (solid_angle > 0) {
-        return (light_intensity / (4 * M_1_PI * std::pow(d, 2))) * (objects[object_id]->albedo / M_PI) * solid_angle;
-      }
-      */
-
 
 			// test if there is a shadow by sending a new ray
 			// if there is no shadow, compute the formula with dot products etc.
@@ -261,7 +250,7 @@ int main() {
 		engine[i].seed(i);
 	}
 
-	Sphere center_sphere(Vector(0, 0, 0), 10., Vector(0.8, 0.8, 0.8));
+	Sphere center_sphere(Vector(0, 0, 0), 10., Vector(0.8, 0.8, 0.8), true);
 	Sphere wall_left(Vector(-1000, 0, 0), 940, Vector(0.5, 0.8, 0.1));
 	Sphere wall_right(Vector(1000, 0, 0), 940, Vector(0.9, 0.2, 0.3));
 	Sphere wall_front(Vector(0, 0, -1000), 940, Vector(0.1, 0.6, 0.7));
